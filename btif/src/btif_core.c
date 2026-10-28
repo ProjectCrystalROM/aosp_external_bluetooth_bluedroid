@@ -483,6 +483,20 @@ bt_status_t btif_init_bluetooth()
     /* As part of the init, fetch the local BD ADDR */
     memset(&btif_local_bd_addr, 0, sizeof(bt_bdaddr_t));
     btif_fetch_local_bdaddr(&btif_local_bd_addr);
+#ifdef BT_PUBLISH_LOCAL_ADDRESS
+    /* Stock hci_qcomm_init must receive the selected persistent address. */
+    {
+        bdstr_t selected_address;
+        const uint8_t zero_address[BD_ADDR_LEN] = {0};
+        if (memcmp(btif_local_bd_addr.address, zero_address, BD_ADDR_LEN) == 0)
+            return BT_STATUS_FAIL;
+        bd2str(&btif_local_bd_addr, &selected_address);
+        if (property_set(PERSIST_BDADDR_PROPERTY, (char*)selected_address) < 0) {
+            BTIF_TRACE_ERROR("Unable to publish local address for hci_qcomm_init");
+            return BT_STATUS_FAIL;
+        }
+    }
+#endif
 
     /* start btif task */
     status = GKI_create_task(btif_task, BTIF_TASK, BTIF_TASK_STR,

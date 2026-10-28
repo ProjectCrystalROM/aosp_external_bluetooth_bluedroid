@@ -17,6 +17,10 @@ ifneq ($(BOARD_BLUETOOTH_BDROID_HCILP_INCLUDED),)
   bdroid_CFLAGS += -DHCILP_INCLUDED=$(BOARD_BLUETOOTH_BDROID_HCILP_INCLUDED)
 endif
 
+ifeq ($(BOARD_BLUETOOTH_PUBLISH_LOCAL_ADDRESS),true)
+bdroid_CFLAGS += -DBT_PUBLISH_LOCAL_ADDRESS
+endif
+
 include $(call all-subdir-makefiles)
 
 # Cleanup our locals
